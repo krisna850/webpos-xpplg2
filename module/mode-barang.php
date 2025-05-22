@@ -54,16 +54,29 @@ function insert($data)
     return mysqli_affected_rows($koneksi);
 }
 
-function delete($id, $foto)
+function delete($id, $gbr)
 {
     global $koneksi;
 
-    $sqlData = "DELETE FROM tbl_user WHERE userid = $id";
-    mysqli_query($koneksi, $sqlData);
-    if ($foto != 'default.png') {
-        unlink('../assets/image/' . $foto);
+    // Delete data dari database dengan prepared statement untuk mencegah SQL Injection
+    $stmt = $koneksi->prepare("DELETE FROM tbl_barang WHERE id_barang = ?");
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+
+    // Cek apakah gambar bukan 'download.jpg' dan valid
+    if ($gbr !== 'download.jpg' && preg_match('/^[\w\-]+\.(jpg|jpeg|png|gif)$/i', $gbr)) {
+        // Dapatkan path file gambar
+        $path = realpath(__DIR__ . '/../assets/image/' . $gbr);
+
+        // Cek apakah path valid dan file ada
+        if ($path && file_exists($path)) {
+            unlink($path);  // Hapus file
+        } else {
+            echo "File tidak ditemukan: $path";
+        }
     }
-    return mysqli_affected_rows($koneksi);
+
+    return $stmt->affected_rows;
 }
 
 // Fungsi select user level

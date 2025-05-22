@@ -126,3 +126,21 @@ function menuSupplier()
     }
     return $result;
 }
+function menuCustomer()
+{
+    if (userMenu() == 'customer') {
+        $result = 'active';
+    } else {
+        $result = null;
+    }
+    return $result;
+}
+function menuBarang()
+{
+    if (userMenu() == 'barang') {
+        $result = 'active';
+    } else {
+        $result = null;
+    }
+    return $result;
+}
